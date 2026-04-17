@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FresherMisa2026.Application/FresherMisa2026.Application.csproj" Id="57d1775c-8486-4d8e-9d85-3a6ede12519c" />
+  <Project Path="FresherMisa2026.Entities/FresherMisa2026.Entities.csproj" Id="b9b5db4e-ee65-4c1c-9366-b6922d2d09e1" />
+  <Project Path="FresherMisa2026.Infrastructure/FresherMisa2026.Infrastructure.csproj" Id="5c89995f-f583-4f6e-9514-0be40dfa9d72" />
+  <Project Path="FresherMisa2026.WebAPI/FresherMisa2026.WebAPI.csproj" Id="f09b3232-9b68-4f27-8bb8-e39eb253f200" />
+</Solution>

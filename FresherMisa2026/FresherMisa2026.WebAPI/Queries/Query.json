@@ -1,0 +1,9 @@
+{
+  "Department.GetByCode": "SELECT * FROM department WHERE DepartmentCode=@DepartmentCode",
+  "Position.GetByCode": "SELECT * FROM position WHERE PositionCode=@PositionCode",
+  "Employee.GetByCode": "SELECT * FROM employee WHERE EmployeeCode=@EmployeeCode",
+  "Employee.GetByDepartmentId": "SELECT * FROM employee WHERE DepartmentID=@DepartmentID AND IsDeleted = FALSE",
+  "Employee.GetByPositionId": "SELECT * FROM employee WHERE PositionID=@PositionID AND IsDeleted = FALSE",
+  "Department.GetEmployeeByDepartmentCode": "SELECT * FROM employee e JOIN department d ON e.DepartmentID = d.DepartmentID WHERE d.DepartmentCode = @DepartmentCode",
+  "Department.GetEmployeeCountByDepartmentCode": "SELECT COUNT(*) AS EmployeeCount FROM department d INNER JOIN employee e ON d.DepartmentID = e.DepartmentID WHERE d.DepartmentCode = @DepartmentCode"
+}

@@ -1,0 +1,6 @@
+@FresherMisa2026.WebAPI_HostAddress = http://localhost:5237
+
+GET {{FresherMisa2026.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
