@@ -90,25 +90,23 @@ namespace FresherMisa2026.Application.Services
 
         }
 
-        public async Task<IEnumerable<Employee>> FilterEmployees(
+        public async Task<PagingResponse<Employee>> FilterEmployees(
             Guid? departmentId,
             Guid? positionId,
             decimal? salaryFrom,
             decimal? salaryTo,
             int? gender,
             DateTime? hireDateFrom,
-            DateTime? hireDateTo)
+            DateTime? hireDateTo,
+            int pageSize,
+            int pageIndex)
         {
-            if (!departmentId.HasValue &&
-                !positionId.HasValue &&
-                !salaryFrom.HasValue &&
-                !salaryTo.HasValue &&
-                !gender.HasValue &&
-                !hireDateFrom.HasValue &&
-                !hireDateTo.HasValue)
-            {
-                return await _employeeRepository.GetEntitiesAsync();
-            }
+
+            if (pageSize <= 0)
+                throw new ArgumentException("PageSize phải > 0");
+
+            if (pageIndex <= 0)
+                throw new ArgumentException("PageIndex phải > 0");
 
             if (departmentId.HasValue && departmentId == Guid.Empty)
             {
@@ -152,7 +150,9 @@ namespace FresherMisa2026.Application.Services
                 salaryTo,
                 gender,
                 hireDateFrom,
-                hireDateTo
+                hireDateTo,
+                pageSize,
+                pageIndex
             );
         }
     }

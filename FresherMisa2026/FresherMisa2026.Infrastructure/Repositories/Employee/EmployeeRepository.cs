@@ -1,6 +1,7 @@
 using Dapper;
 using FresherMisa2026.Application.Extensions;
 using FresherMisa2026.Application.Interfaces.Repositories;
+using FresherMisa2026.Entities;
 using FresherMisa2026.Entities.Employee;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
@@ -44,63 +45,85 @@ namespace FresherMisa2026.Infrastructure.Repositories
             return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
-        public async Task<IEnumerable<Employee>> FilterEmployees(
+        public async Task<PagingResponse<Employee>> FilterEmployees(
             Guid? departmentId,
             Guid? positionId,
             decimal? salaryFrom,
             decimal? salaryTo,
             int? gender,
             DateTime? hireDateFrom,
-            DateTime? hireDateTo)
+            DateTime? hireDateTo,
+            int pageSize,
+            int pageIndex)
         {
-            var sql = new StringBuilder();
-            sql.Append(@"SELECT * FROM employee WHERE 1=1 ");
-
+            var where = new StringBuilder(" WHERE 1=1 ");
             var param = new DynamicParameters();
 
             if (departmentId.HasValue)
             {
-                sql.Append(" AND DepartmentID = @DepartmentId");
+                where.Append(" AND DepartmentID = @DepartmentId");
                 param.Add("@DepartmentId", departmentId);
             }
 
             if (positionId.HasValue)
             {
-                sql.Append(" AND PositionID = @PositionId");
+                where.Append(" AND PositionID = @PositionId");
                 param.Add("@PositionId", positionId);
             }
 
             if (salaryFrom.HasValue)
             {
-                sql.Append(" AND Salary >= @SalaryFrom");
+                where.Append(" AND Salary >= @SalaryFrom");
                 param.Add("@SalaryFrom", salaryFrom);
             }
 
             if (salaryTo.HasValue)
             {
-                sql.Append(" AND Salary <= @SalaryTo");
+                where.Append(" AND Salary <= @SalaryTo");
                 param.Add("@SalaryTo", salaryTo);
             }
 
             if (gender.HasValue)
             {
-                sql.Append(" AND Gender = @Gender");
+                where.Append(" AND Gender = @Gender");
                 param.Add("@Gender", gender);
             }
 
             if (hireDateFrom.HasValue)
             {
-                sql.Append(" AND HireDate >= @HireDateFrom");
+                where.Append(" AND HireDate >= @HireDateFrom");
                 param.Add("@HireDateFrom", hireDateFrom);
             }
 
             if (hireDateTo.HasValue)
             {
-                sql.Append(" AND HireDate <= @HireDateTo");
+                where.Append(" AND HireDate <= @HireDateTo");
                 param.Add("@HireDateTo", hireDateTo);
             }
 
-            return await _dbConnection.QueryAsync<Employee>(sql.ToString(), param);
+            // Total
+            var totalQuery = $"SELECT COUNT(*) FROM employee {where}";
+            var total = await _dbConnection.ExecuteScalarAsync<int>(totalQuery, param);
+
+            // Data
+            var offset = (pageIndex - 1) * pageSize;
+
+            var dataQuery = $@"
+                SELECT * 
+                FROM employee
+                {where}
+                ORDER BY CreatedDate DESC
+                LIMIT {offset}, {pageSize}";
+
+            var data = await _dbConnection.QueryAsync<Employee>(dataQuery, param);
+
+            return new PagingResponse<Employee>
+            {
+                Total = total,
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                Data = data
+            };
         }
     }
 }

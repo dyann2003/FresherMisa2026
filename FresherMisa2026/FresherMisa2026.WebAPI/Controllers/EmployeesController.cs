@@ -54,7 +54,9 @@ namespace FresherMisa2026.WebAPI.Controllers
             decimal? salaryTo,
             int? gender,
             DateTime? hireDateFrom,
-            DateTime? hireDateTo)
+            DateTime? hireDateTo,
+            int pageSize = 10,
+            int pageIndex = 1)
         {
             try
             {
@@ -65,7 +67,9 @@ namespace FresherMisa2026.WebAPI.Controllers
                 salaryTo,
                 gender,
                 hireDateFrom,
-                hireDateTo
+                hireDateTo,
+                pageSize,
+                pageIndex
                 );
 
                 return Ok(result);
