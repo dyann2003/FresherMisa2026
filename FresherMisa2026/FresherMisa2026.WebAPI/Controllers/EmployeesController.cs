@@ -45,5 +45,42 @@ namespace FresherMisa2026.WebAPI.Controllers
 
             return response;
         }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterEmployees(
+            Guid? departmentId,
+            Guid? positionId,
+            decimal? salaryFrom,
+            decimal? salaryTo,
+            int? gender,
+            DateTime? hireDateFrom,
+            DateTime? hireDateTo)
+        {
+            try
+            {
+                var result = await _employeeService.FilterEmployees(
+                departmentId,
+                positionId,
+                salaryFrom,
+                salaryTo,
+                gender,
+                hireDateFrom,
+                hireDateTo
+                );
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Lỗi hệ thống");
+            }
+        }
     }
 }

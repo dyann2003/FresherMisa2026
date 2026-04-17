@@ -89,5 +89,71 @@ namespace FresherMisa2026.Application.Services
             return errors;
 
         }
+
+        public async Task<IEnumerable<Employee>> FilterEmployees(
+            Guid? departmentId,
+            Guid? positionId,
+            decimal? salaryFrom,
+            decimal? salaryTo,
+            int? gender,
+            DateTime? hireDateFrom,
+            DateTime? hireDateTo)
+        {
+            if (!departmentId.HasValue &&
+                !positionId.HasValue &&
+                !salaryFrom.HasValue &&
+                !salaryTo.HasValue &&
+                !gender.HasValue &&
+                !hireDateFrom.HasValue &&
+                !hireDateTo.HasValue)
+            {
+                return await _employeeRepository.GetEntitiesAsync();
+            }
+
+            if (departmentId.HasValue && departmentId == Guid.Empty)
+            {
+                throw new ArgumentException("DepartmentId không hợp lệ");
+            }
+
+            if (positionId.HasValue && positionId == Guid.Empty)
+            {
+                throw new ArgumentException("PositionId không hợp lệ");
+            }
+
+            if (salaryFrom.HasValue && salaryFrom < 0)
+            {
+                throw new ArgumentException("SalaryFrom phải >= 0");
+            }
+
+            if (salaryTo.HasValue && salaryTo < 0)
+            {
+                throw new ArgumentException("SalaryTo phải >= 0");
+            }
+
+            if (salaryFrom.HasValue && salaryTo.HasValue && salaryFrom > salaryTo)
+            {
+                throw new ArgumentException("Mức lương từ phải nhỏ hơn mức lương đến");
+            }
+
+            if (hireDateFrom.HasValue && hireDateTo.HasValue && hireDateFrom > hireDateTo)
+            {
+                throw new ArgumentException("Ngày tuyển dụng từ phải nhỏ hơn ngày tuyển dụng đến");
+            }
+
+            if (hireDateTo.HasValue && hireDateTo > DateTime.Now)
+            {
+                throw new ArgumentException("Ngày tuyển dụng không được lớn hơn hiện tại");
+            }
+
+            return await _employeeRepository.FilterEmployees(
+                departmentId,
+                positionId,
+                salaryFrom,
+                salaryTo,
+                gender,
+                hireDateFrom,
+                hireDateTo
+            );
+        }
     }
 }

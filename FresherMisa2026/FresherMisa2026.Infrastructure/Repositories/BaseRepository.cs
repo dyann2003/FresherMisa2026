@@ -77,7 +77,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
         /// </summary>
         /// <returns>Danh sách tất cả bản ghi</returns>
         /// Created By: dvhai (09/04/2026)
-        public async Task<IEnumerable<BaseModel>> GetEntitiesAsync()
+        public async Task<IEnumerable<TEntity>> GetEntitiesAsync()
         {
             return await GetEntitiesUsingCommandTextAsync();
         }
@@ -214,8 +214,9 @@ namespace FresherMisa2026.Infrastructure.Repositories
 
                     if (ex.Number == 1644)
                     {
-                        throw new Exception($"{_tableName}Code đã tồn tại trong hệ thống.");
+                        return -1;
                     }
+
                     throw;
                 }
             }
@@ -252,9 +253,14 @@ namespace FresherMisa2026.Infrastructure.Repositories
 
                     transaction.Commit();
                 }
-                catch
+                catch (MySqlException ex)
                 {
                     transaction.Rollback();
+                    if (ex.Number == 1644)
+                    {
+                        return -1;
+                    }
+
                     throw;
                 }
             }

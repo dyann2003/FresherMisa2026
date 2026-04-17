@@ -202,6 +202,14 @@ namespace FresherMisa2026.Application.Services
             if (errors.Count == 0)
             {
                 var result = await _baseRepository.InsertAsync(entity);
+                if (result == -1)
+                {
+                    return CreateErrorResponse(
+                        ResponseCode.BadRequest,
+                        $"{_tableName}Code đã tồn tại",
+                        $"{_tableName}Code đã tồn tại trong hệ thống"
+                    );
+                }
                 return CreateSuccessResponse(result);
             }
 
@@ -238,6 +246,14 @@ namespace FresherMisa2026.Application.Services
                 if (rowAffects > 0)
                 {
                     return CreateSuccessResponse(rowAffects);
+                }
+                if (rowAffects == -1)
+                {
+                    return CreateErrorResponse(
+                        ResponseCode.BadRequest,
+                        $"{_tableName}Code đã tồn tại",
+                        $"{_tableName}Code đã tồn tại trong hệ thống"
+                    );
                 }
                 return CreateErrorResponse(ResponseCode.NotFound, "Không tìm thấy bản ghi để cập nhật");
             }

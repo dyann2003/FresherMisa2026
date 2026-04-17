@@ -30,7 +30,7 @@ namespace FresherMisa2026.Application.Interfaces
         /// </summary>
         /// <returns>Danh sách tất cả bản ghi</returns>
         /// CREATED BY: DVHAI (07/07/2026)
-        Task<IEnumerable<BaseModel>> GetEntitiesAsync();
+        Task<IEnumerable<TEntity>> GetEntitiesAsync();
 
         /// <summary>
         /// Lấy bản ghi theo id

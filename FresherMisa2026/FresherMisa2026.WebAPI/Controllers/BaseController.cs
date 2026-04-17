@@ -109,16 +109,23 @@ namespace FresherMisa2026.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ServiceResponse>> Put([FromRoute] string id, [FromBody] TEntity entity)
         {
-            var response = await _baseService.UpdateAsync(Guid.Parse(id), entity);
-
-            if (!response.IsSuccess)
+            try
             {
-                if (response.Code == (int)ResponseCode.NotFound)
-                    return NotFound(response);
-                return BadRequest(response);
-            }
+                var response = await _baseService.UpdateAsync(Guid.Parse(id), entity);
 
-            return Ok(response);
+                if (!response.IsSuccess)
+                {
+                    if (response.Code == (int)ResponseCode.NotFound)
+                        return NotFound(response);
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+                }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
