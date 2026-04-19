@@ -3,6 +3,7 @@ using FresherMisa2026.Application.Extensions;
 using FresherMisa2026.Application.Interfaces.Repositories;
 using FresherMisa2026.Entities;
 using FresherMisa2026.Entities.Employee;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text;
@@ -11,38 +12,41 @@ namespace FresherMisa2026.Infrastructure.Repositories
 {
     public class EmployeeRepository : BaseRepository<Employee>, IEmployeeRepository
     {
-        public EmployeeRepository(IConfiguration configuration) : base(configuration)
+        public EmployeeRepository(IConfiguration configuration, IMemoryCache cache) : base(configuration, cache)
         {
         }
 
         public async Task<Employee> GetEmployeeByCode(string code)
         {
+            using var connection = CreateConnection();
             string query = SQLExtension.GetQuery("Employee.GetByCode");
             var param = new Dictionary<string, object>
             {
                 {"@EmployeeCode", code }
             };
-            return await _dbConnection.QueryFirstOrDefaultAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+            return await connection.QueryFirstOrDefaultAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
         public async Task<IEnumerable<Employee>> GetEmployeesByDepartmentId(Guid departmentId)
         {
+            using var connection = CreateConnection();
             string query = SQLExtension.GetQuery("Employee.GetByDepartmentId");
             var param = new Dictionary<string, object>
             {
                 {"@DepartmentID", departmentId }
             };
-            return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+            return await connection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
         public async Task<IEnumerable<Employee>> GetEmployeesByPositionId(Guid positionId)
         {
+            using var connection = CreateConnection();
             string query = SQLExtension.GetQuery("Employee.GetByPositionId");
             var param = new Dictionary<string, object>
             {
                 {"@PositionID", positionId }
             };
-            return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+            return await connection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
         public async Task<PagingResponse<Employee>> FilterEmployees(
@@ -56,6 +60,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
             int pageSize,
             int pageIndex)
         {
+            using var connection = CreateConnection();
             var where = new StringBuilder(" WHERE 1=1 ");
             var param = new DynamicParameters();
 
@@ -103,7 +108,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
 
             // Total
             var totalQuery = $"SELECT COUNT(*) FROM employee {where}";
-            var total = await _dbConnection.ExecuteScalarAsync<int>(totalQuery, param);
+            var total = await connection.ExecuteScalarAsync<int>(totalQuery, param);
 
             // Data
             var offset = (pageIndex - 1) * pageSize;
@@ -115,7 +120,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
                 ORDER BY CreatedDate DESC
                 LIMIT {offset}, {pageSize}";
 
-            var data = await _dbConnection.QueryAsync<Employee>(dataQuery, param);
+            var data = await connection.QueryAsync<Employee>(dataQuery, param);
 
             return new PagingResponse<Employee>
             {
